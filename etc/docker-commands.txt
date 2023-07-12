@@ -1,0 +1,11 @@
+docker run -d --rm -p 6831:6831/udp -p 9411:9411 -p 55680:55680 -p 3100:3100 -p 14250:14250 --name tempo -v /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/tempo-local.yaml:/etc/tempo-local.yaml --network docker-tempo  grafana/tempo:latest --config.file=/etc/tempo-local.yaml
+
+docker run -d --rm -p 16686:16686 --name tempo-query -v /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/tempo-query.yaml:/etc/tempo-query.yaml  --network docker-tempo  grafana/tempo-query:latest  --grpc-storage-plugin.configuration-file=/etc/tempo-query.yaml
+
+docker run -d --name grafana -p 3000:3000 --network docker-tempo grafana/grafana:latest
+
+docker run -d --name prometheus --network docker-tempo -v /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/prometheus.yaml:/etc/prometheus/prometheus.yml -p 9090:9090 bitnami/prometheus:latest
+
+docker run --name loki --network docker-tempo -d -v /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/loki.yaml:/mnt/loki.yaml -p 3200:3200 grafana/loki:2.2.0 -config.file=/mnt/loki.yaml
+
+docker run --name promtail --network docker-tempo -d -v /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/promtail.yaml:/mnt/promtail.yaml -v /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/data/app_log/:/var/log/ grafana/promtail:2.2.0 -config.file=/mnt/promtail.yaml

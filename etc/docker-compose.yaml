@@ -1,0 +1,29 @@
+version: "3"
+
+networks:
+  docker-tempo:
+
+services:
+  loki:
+    image: grafana/loki:2.2.0
+    container_name: loki
+    volumes:
+      #    将loki的配置文件挂载到本地 c:/docker/loki 目录
+      - /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/loki.yaml:/etc/loki.yaml
+    ports:
+      - "3200:3200"
+    command: -config.file=/etc/loki.yaml
+    networks:
+      - docker-tempo
+
+  promtail:
+    image: grafana/promtail:2.2.0
+    container_name: promtail
+    volumes:
+      #  为了读取本地的日志目录，这个是个默认配置目的就是为跑起来，生产肯定不是这样的。
+      - /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/data/app_log/:/var/log/
+      #  promtail  的配置文件也挂载到本地 c:/docker/promtail目录
+      - /Users/zhumingyuan/java_workspace/boot-opentelemetry-tempo-simply/etc/promtail.yaml:/etc/promtail/promtail.yaml
+    command: -config.file=/etc/promtail/promtail.yaml
+    networks:
+      - docker-tempo
