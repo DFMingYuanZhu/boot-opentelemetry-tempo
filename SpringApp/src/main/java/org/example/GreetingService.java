@@ -1,7 +1,5 @@
 package org.example;
 
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.extension.annotations.WithSpan;
 import java.util.concurrent.TimeUnit;
@@ -19,39 +17,26 @@ public class GreetingService {
 
     private static final Logger logger = LoggerFactory.getLogger(GreetingService.class);
 
-    public void doSomeWorkSameSpan() throws InterruptedException {
-        Span span = Span.current();
 
-        span.setAttribute("attribute.a0", "value");
-        logger.info("Doing some work In Same span");
+    public void greeting1() throws InterruptedException {
+        logger.info("greeting1");
         TimeUnit.SECONDS.sleep(1);
     }
 
-    @WithSpan
-    public void doSomeWorkNewSpan() throws InterruptedException {
-        logger.info("Doing some work In new span");
+    @WithSpan("custom-span")
+    public void greeting2() throws InterruptedException {
+        logger.info("greeting2");
+        TimeUnit.SECONDS.sleep(2);
+    }
+
+
+    public void greeting3() throws InterruptedException {
+        logger.info("greeting3");
         Span span = Span.current();
-
-        span.setAttribute("attribute.a1", "some value");
-
-        span.addEvent("app.processing1.start", atttributes("123"));
-        doSomeWorkNestedSpan();
-        span.addEvent("app.processing1.end", atttributes("123"));
+        span.setAttribute("a1", "greeting3-inner-block");
+        span.addEvent("greeting3-inner-block-start");
+        TimeUnit.SECONDS.sleep(3);
+        span.addEvent("greeting3-inner-block-end");
     }
 
-    @WithSpan
-    public void doSomeWorkNestedSpan() throws InterruptedException {
-        logger.info("Doing some work In Nested span");
-        Span span = Span.current();
-
-        span.setAttribute("attribute.a2", "some value");
-
-        span.addEvent("app.processing2.start", atttributes("321"));
-        TimeUnit.SECONDS.sleep(1);
-        span.addEvent("app.processing2.end", atttributes("321"));
-    }
-
-    private Attributes atttributes(String id) {
-        return Attributes.of(AttributeKey.stringKey("app.id"), "" + id);
-    }
 }
