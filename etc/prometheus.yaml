@@ -27,9 +27,9 @@ scrape_configs:
 
     static_configs:
       - targets: ['localhost:9090']
-  ### 以下内容为springboot的配置，主要是这个地方
+  ### springboot settings
   - job_name: 'spring-boot-app'
     scrape_interval: 5s
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['192.168.1.154:8080']
+      - targets: ['192.168.1.154:8080'] # host machine ip address
